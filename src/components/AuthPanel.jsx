@@ -4,10 +4,30 @@ import { useAuth } from '../context/useAuth'
 export function AuthPanel() {
   const { user, signOut, signIn, signUp, authEnabled } = useAuth()
   const [mode, setMode] = useState('signin')
-  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const toErrorMessage = (error) => {
+    if (error instanceof Error && error.message) {
+      return error.message
+    }
+
+    if (typeof error === 'string') {
+      return error
+    }
+
+    if (error && typeof error === 'object') {
+      try {
+        return `Request failed: ${JSON.stringify(error)}`
+      } catch {
+        return 'Request failed due to an unknown error object.'
+      }
+    }
+
+    return 'Request failed due to an unexpected error.'
+  }
 
   const submit = async (event) => {
     event.preventDefault()
@@ -16,16 +36,16 @@ export function AuthPanel() {
 
     try {
       if (mode === 'signup') {
-        await signUp({ email, password })
-        setMessage('Account created. Check your email for confirmation link.')
+        await signUp({ name, password })
+        setMessage('Account created and signed in successfully.')
       } else {
-        await signIn({ email, password })
+        await signIn({ name, password })
         setMessage('Signed in successfully.')
       }
 
       setPassword('')
     } catch (error) {
-      setMessage(error.message)
+      setMessage(toErrorMessage(error))
     } finally {
       setIsSubmitting(false)
     }
@@ -35,7 +55,7 @@ export function AuthPanel() {
     return (
       <section className="auth-panel">
         <p>
-          Signed in as <strong>{user.email}</strong>
+          Signed in as <strong>{user.username}</strong>
         </p>
         <button type="button" className="neon-button" onClick={signOut}>
           Sign out
@@ -69,12 +89,13 @@ export function AuthPanel() {
 
       <form className="auth-form" onSubmit={submit}>
         <label>
-          Email
+          Name
           <input
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            type="text"
+            autoComplete="username"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            minLength={3}
             required
           />
         </label>
@@ -95,7 +116,7 @@ export function AuthPanel() {
       </form>
 
       <p className="auth-help">
-        Voting requires email and password login.
+        Voting requires name and password login.
         {!authEnabled ? ' Add Supabase env keys to enable login.' : ''}
       </p>
       {message ? <p className="auth-message">{message}</p> : null}

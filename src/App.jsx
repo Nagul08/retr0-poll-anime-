@@ -140,7 +140,7 @@ function App() {
 
   const onVote = async (pollId, optionId) => {
     if (!identityKey) {
-      throw new Error('Sign in with email and password to vote.')
+      throw new Error('Sign in with name and password to vote.')
     }
 
     await castVote({ pollId, optionId, identityKey })
@@ -204,7 +204,7 @@ function App() {
           target="_blank"
           rel="noreferrer"
         >
-          Made in rush by 
+          <span className="footer-credit-text">Made in rush by</span>
           <img className="footer-credit-logo" src="/retr0.svg" alt="retr0" />
         </a>
       </footer>

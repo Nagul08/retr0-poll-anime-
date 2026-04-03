@@ -3,6 +3,7 @@ import { AuthContext } from './auth-context'
 import { supabase } from '../lib/supabaseClient'
 
 const USER_STORAGE = 'anime-poll-auth-user'
+const AUTH_NAME_DOMAIN = 'retr0.local'
 
 const getInitialUser = () => {
   const rawUser = localStorage.getItem(USER_STORAGE)
@@ -31,9 +32,13 @@ const toProviderUser = (authUser) => {
     id: authUser.id,
     username: displayName,
     email,
-    type: 'email',
+    type: 'name',
   }
 }
+
+const normalizeName = (name) => (name ?? '').trim().toLowerCase()
+
+const toAuthEmail = (name) => `${normalizeName(name).replace(/[^a-z0-9._-]/g, '-')}@${AUTH_NAME_DOMAIN}`
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(getInitialUser)
@@ -89,37 +94,77 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  const signUp = async ({ email, password }) => {
+  const signUp = async ({ name, password }) => {
     if (!supabase) {
-      throw new Error('Email login requires Supabase credentials in your .env file.')
+      throw new Error('Name login requires Supabase credentials in your .env file.')
     }
 
-    const normalizedEmail = email.trim().toLowerCase()
-    const { error } = await supabase.auth.signUp({
-      email: normalizedEmail,
+    const normalizedName = normalizeName(name)
+    if (!normalizedName) {
+      throw new Error('Name is required.')
+    }
+
+    const authEmail = toAuthEmail(normalizedName)
+    const { data, error } = await supabase.auth.signUp({
+      email: authEmail,
       password,
+      options: {
+        data: {
+          username: normalizedName,
+        },
+      },
     })
 
     if (error) {
-      throw error
+      const message = error.message || 'Sign up failed due to an authentication service error.'
+      if (/confirmation email|error sending confirmation email|smtp/i.test(message)) {
+        throw new Error(
+          'Supabase is trying to send a confirmation email. Disable Auth > Providers > Email > Confirm email in Supabase, or configure SMTP credentials.',
+        )
+      }
+      throw new Error(message)
     }
 
-    return { success: true }
+    if (!data?.user) {
+      throw new Error(
+        'Sign up returned an empty response from auth service.',
+      )
+    }
+
+    if (!data?.session) {
+      const signInResult = await supabase.auth.signInWithPassword({
+        email: authEmail,
+        password,
+      })
+
+      if (signInResult.error) {
+        throw new Error(signInResult.error.message || 'Account created but automatic sign in failed.')
+      }
+    }
+
+    return {
+      success: true,
+    }
   }
 
-  const signIn = async ({ email, password }) => {
+  const signIn = async ({ name, password }) => {
     if (!supabase) {
-      throw new Error('Email login requires Supabase credentials in your .env file.')
+      throw new Error('Name login requires Supabase credentials in your .env file.')
     }
 
-    const normalizedEmail = email.trim().toLowerCase()
+    const normalizedName = normalizeName(name)
+    if (!normalizedName) {
+      throw new Error('Name is required.')
+    }
+
+    const authEmail = toAuthEmail(normalizedName)
     const { error } = await supabase.auth.signInWithPassword({
-      email: normalizedEmail,
+      email: authEmail,
       password,
     })
 
     if (error) {
-      throw error
+      throw new Error(error.message || 'Sign in failed due to an authentication service error.')
     }
 
     return { success: true }

@@ -102,7 +102,7 @@ export const getPollById = async (pollId) => {
 
 export const castVote = async ({ pollId, optionId, identityKey }) => {
   if (!identityKey) {
-    throw new Error('Sign in with email and password to vote.')
+    throw new Error('Sign in with name and password to vote.')
   }
 
   if (supabase) {
