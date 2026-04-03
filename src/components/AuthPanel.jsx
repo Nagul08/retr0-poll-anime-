@@ -17,7 +17,7 @@ export function AuthPanel() {
     try {
       if (mode === 'signup') {
         await signUp({ email, password })
-        setMessage('Account created. Check your email if confirmation is enabled, then sign in.')
+        setMessage('Account created. Check your email for confirmation link.')
       } else {
         await signIn({ email, password })
         setMessage('Signed in successfully.')
