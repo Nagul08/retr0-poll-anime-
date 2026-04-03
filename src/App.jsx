@@ -198,6 +198,15 @@ function App() {
 
       <footer className="site-footer">
         <p>retr0 anime poll. One vote per identity.</p>
+        <a
+          className="footer-credit"
+          href="https://github.com/Nagul08"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Made in rush by 
+          <img className="footer-credit-logo" src="/retr0.svg" alt="retr0" />
+        </a>
       </footer>
     </div>
   )
