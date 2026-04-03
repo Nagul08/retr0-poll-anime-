@@ -9,6 +9,7 @@ export function Home({ featuredPoll }) {
     <div className="page home-page">
       <header className="hero-panel">
         <LogoWordmark />
+        <h1 className="sr-only">retr0 anime poll</h1>
         <p className="tagline">A neon battleground for anime rankings and hot takes.</p>
         <div className="hero-actions">
           <Link className="neon-button" to="/polls">

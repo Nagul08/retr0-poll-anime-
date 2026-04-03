@@ -1,10 +1,10 @@
-export function LogoWordmark() {
+export function LogoWordmark({ compact = false }) {
   return (
-    <h1 className="logo-wordmark" aria-label="retr0 anime poll">
-      <span className="logo-main">retr0</span>
-      <span className="logo-shadow" aria-hidden="true">
-        retr0
-      </span>
-    </h1>
+    <img
+      className={compact ? 'logo-image logo-image-compact' : 'logo-image'}
+      src="/retr0.svg"
+      alt="retr0 anime poll"
+      loading="eager"
+    />
   )
 }

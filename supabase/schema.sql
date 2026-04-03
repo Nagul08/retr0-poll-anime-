@@ -30,6 +30,8 @@ create index if not exists poll_options_poll_id_idx on poll_options (poll_id);
 create or replace function increment_poll_option_votes()
 returns trigger
 language plpgsql
+security definer
+set search_path = public
 as $$
 begin
   update poll_options

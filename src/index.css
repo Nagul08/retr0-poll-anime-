@@ -37,6 +37,29 @@ body {
     radial-gradient(circle at 18% 42%, rgba(52, 255, 90, 0.2), transparent 46%),
     linear-gradient(180deg, var(--bg-0), var(--bg-1));
   color: var(--ink);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: url('/retr0-f.png') center 20% / min(86vw, 980px) auto no-repeat;
+  filter: blur(26px) saturate(1.2);
+  opacity: 0.28;
+  transform: scale(1.12);
+  pointer-events: none;
+  z-index: -2;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.56));
+  pointer-events: none;
+  z-index: -1;
 }
 
 a {
@@ -71,10 +94,8 @@ a {
 }
 
 .brand-link {
-  font-family: 'Rubik Spray Paint', cursive;
-  font-size: clamp(1.1rem, 1rem + 1.1vw, 1.8rem);
-  color: var(--green);
-  text-shadow: 2px 0 var(--purple);
+  display: inline-flex;
+  align-items: center;
 }
 
 .main-nav {
@@ -138,35 +159,17 @@ main {
   position: relative;
 }
 
-.logo-wordmark {
-  margin: 0;
-  line-height: 1;
-  font-size: clamp(3.2rem, 8vw, 6.2rem);
-  transform: rotate(-8deg);
-  position: relative;
-  width: fit-content;
-}
-
-.logo-main,
-.logo-shadow {
-  font-family: 'Rubik Spray Paint', cursive;
+.logo-image {
   display: block;
+  width: clamp(240px, 58vw, 520px);
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 28px rgba(146, 0, 255, 0.72)) drop-shadow(0 0 16px rgba(52, 255, 90, 0.58));
 }
 
-.logo-main {
-  color: var(--purple);
-  text-shadow: 0 0 24px rgba(146, 0, 255, 0.92);
-  position: relative;
-  z-index: 2;
-}
-
-.logo-shadow {
-  color: var(--green);
-  position: absolute;
-  left: -0.12em;
-  top: 0.08em;
-  z-index: 1;
-  opacity: 0.95;
+.logo-image-compact {
+  width: clamp(90px, 10vw, 132px);
+  filter: drop-shadow(0 0 16px rgba(146, 0, 255, 0.55)) drop-shadow(0 0 10px rgba(52, 255, 90, 0.45));
 }
 
 .tagline {
@@ -308,6 +311,21 @@ input {
   color: var(--danger);
 }
 
+.oauth-block {
+  margin-top: 0.8rem;
+  display: grid;
+  gap: 0.45rem;
+  max-width: 350px;
+}
+
+.oauth-label {
+  margin: 0;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+}
+
 .page-title-wrap {
   margin-bottom: 1rem;
 }
@@ -414,6 +432,31 @@ input {
 
 .chart-wrap {
   min-height: 320px;
+}
+
+.not-found-page {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.site-footer {
+  margin-top: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.8rem;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @keyframes fade-rise {

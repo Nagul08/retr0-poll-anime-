@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import clsx from 'clsx'
 import { ResultsChart } from '../components/ResultsChart'
 
-export function PollDetail({ poll, existingVote, onVote }) {
+export function PollDetail({ poll, existingVote, canVote, onVote }) {
   const [voteError, setVoteError] = useState('')
   const [isVoting, setIsVoting] = useState(false)
 
@@ -58,7 +58,7 @@ export function PollDetail({ poll, existingVote, onVote }) {
               key={option.id}
               type="button"
               className={clsx('vote-option', selected && 'vote-option-selected')}
-              disabled={Boolean(existingVote) || isVoting}
+              disabled={!canVote || Boolean(existingVote) || isVoting}
               onClick={() => submitVote(option.id)}
             >
               <span>{option.label}</span>
@@ -68,6 +68,7 @@ export function PollDetail({ poll, existingVote, onVote }) {
         })}
       </section>
 
+      {!canVote ? <p className="vote-note">Sign in with email and password to vote on this poll.</p> : null}
       {existingVote ? <p className="vote-note">You already voted on this poll.</p> : null}
       {voteError ? <p className="vote-error">{voteError}</p> : null}
 

@@ -101,6 +101,10 @@ export const getPollById = async (pollId) => {
 }
 
 export const castVote = async ({ pollId, optionId, identityKey }) => {
+  if (!identityKey) {
+    throw new Error('Sign in with email and password to vote.')
+  }
+
   if (supabase) {
     const { error } = await supabase.from('votes').insert({
       poll_id: pollId,
@@ -123,5 +127,29 @@ export const castVote = async ({ pollId, optionId, identityKey }) => {
 
 export const getExistingVote = ({ pollId, identityKey }) => {
   if (!identityKey) return null
+  if (supabase) return null
   return getIdentityVote(identityKey, pollId)
+}
+
+export const listVotesByIdentity = async (identityKey) => {
+  if (!identityKey) {
+    return []
+  }
+
+  if (supabase) {
+    const { data, error } = await supabase
+      .from('votes')
+      .select('poll_id,option_id')
+      .eq('identity_key', identityKey)
+
+    if (error) throw error
+    return data
+  }
+
+  const votesByIdentity = readLocalVotes()
+  const identityVotes = votesByIdentity[identityKey] ?? {}
+  return Object.entries(identityVotes).map(([poll_id, option_id]) => ({
+    poll_id,
+    option_id,
+  }))
 }

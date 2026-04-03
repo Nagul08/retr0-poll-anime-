@@ -1,12 +1,7 @@
-import { useMemo } from 'react'
 import { PollCard } from '../components/PollCard'
 import { PollFilters } from '../components/PollFilters'
 
-export function Polls({ polls, activeCategory, onChangeCategory }) {
-  const categories = useMemo(() => {
-    const unique = new Set(polls.map((poll) => poll.category))
-    return ['All', ...unique]
-  }, [polls])
+export function Polls({ polls, categories, activeCategory, onChangeCategory }) {
 
   return (
     <div className="page polls-page">

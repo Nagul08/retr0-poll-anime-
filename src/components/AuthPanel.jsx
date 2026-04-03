@@ -2,29 +2,32 @@ import { useState } from 'react'
 import { useAuth } from '../context/useAuth'
 
 export function AuthPanel() {
-  const { user, signIn, signUp, signOut } = useAuth()
+  const { user, signOut, signIn, signUp, authEnabled } = useAuth()
   const [mode, setMode] = useState('signin')
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [message, setMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault()
     setMessage('')
+    setIsSubmitting(true)
 
     try {
       if (mode === 'signup') {
-        signUp({ username, password })
-        setMessage('Account created. You are now signed in.')
+        await signUp({ email, password })
+        setMessage('Account created. Check your email if confirmation is enabled, then sign in.')
       } else {
-        signIn({ username, password })
+        await signIn({ email, password })
         setMessage('Signed in successfully.')
       }
 
-      setUsername('')
       setPassword('')
     } catch (error) {
       setMessage(error.message)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -32,7 +35,7 @@ export function AuthPanel() {
     return (
       <section className="auth-panel">
         <p>
-          Signed in as <strong>{user.username}</strong>
+          Signed in as <strong>{user.email}</strong>
         </p>
         <button type="button" className="neon-button" onClick={signOut}>
           Sign out
@@ -66,12 +69,12 @@ export function AuthPanel() {
 
       <form className="auth-form" onSubmit={submit}>
         <label>
-          Username
+          Email
           <input
-            type="text"
-            autoComplete="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
             required
           />
         </label>
@@ -86,12 +89,15 @@ export function AuthPanel() {
             required
           />
         </label>
-        <button className="neon-button" type="submit">
-          {mode === 'signup' ? 'Create account' : 'Sign in'}
+        <button className="neon-button" type="submit" disabled={!authEnabled || isSubmitting}>
+          {isSubmitting ? 'Please wait...' : mode === 'signup' ? 'Create account' : 'Sign in'}
         </button>
       </form>
 
-      <p className="auth-help">Guest voting works without login. Accounts are optional.</p>
+      <p className="auth-help">
+        Voting requires email and password login.
+        {!authEnabled ? ' Add Supabase env keys to enable login.' : ''}
+      </p>
       {message ? <p className="auth-message">{message}</p> : null}
     </section>
   )
